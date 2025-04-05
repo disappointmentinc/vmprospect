@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2196f3">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+  <title>ProspectPro - Website Analysis Tool</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="logo">
+        <i class="fas fa-chart-line"></i>
+        <h1>ProspectPro</h1>
+      </div>
+      <nav class="main-nav">
+        <button id="menuToggle" class="menu-toggle">
+          <i class="fas fa-bars"></i>
+        </button>
+        <ul id="navMenu" class="nav-menu">
+          <li><a href="#" class="active" data-view="analyze">Analyze</a></li>
+          <li><a href="#" data-view="history">History</a></li>
+          <li><a href="#" data-view="settings">Settings</a></li>
+        </ul>
+      </nav>
+    </header>
+    
+    <main class="app-content">
+      <!-- Analyze View -->
+      <section id="analyzeView" class="view active">
+        <div class="container">
+          <div class="card">
+            <h2>Website Analysis</h2>
+            <p>Enter a URL to analyze its SEO, performance, and competitive position</p>
+            
+            <form id="analyzeForm" class="analyze-form">
+              <div class="input-group">
+                <input 
+                  type="url" 
+                  id="urlInput" 
+                  placeholder="https://example.com" 
+                  required
+                  pattern="https?://.+"
+                >
+                <button type="submit" id="analyzeButton">
+                  <i class="fas fa-search"></i> Analyze
+                </button>
+              </div>
+              <div class="checkbox-group">
+                <label>
+                  <input type="checkbox" id="saveResults" checked>
+                  Save results for later
+                </label>
+              </div>
+            </form>
+          </div>
+          
+          <div id="loadingIndicator" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <p>Analyzing website... This may take a minute.</p>
+          </div>
+          
+          <div id="resultsContainer" class="results-container hidden">
+            <!-- Results will be populated here by JavaScript -->
+          </div>
+        </div>
+      </section>
+      
+      <!-- History View -->
+      <section id="historyView" class="view">
+        <div class="container">
+          <div class="card">
+            <h2>Analysis History</h2>
+            <p>View your previous website analyses</p>
+            
+            <div class="filters">
+              <input type="text" id="historySearch" placeholder="Search by URL...">
+              <select id="historySort">
+                <option value="date-desc">Newest First</option>
+                <option value="date-asc">Oldest First</option>
+                <option value="score-desc">Highest Score</option>
+                <option value="score-asc">Lowest Score</option>
+              </select>
+            </div>
+            
+            <div id="historyList" class="history-list">
+              <!-- History items will be populated here by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Settings View -->
+      <section id="settingsView" class="view">
+        <div class="container">
+          <div class="card">
+            <h2>Settings</h2>
+            
+            <div class="settings-group">
+              <h3>Display</h3>
+              <div class="setting-item">
+                <label for="darkMode">Dark Mode</label>
+                <label class="switch">
+                  <input type="checkbox" id="darkMode">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label for="compactView">Compact View</label>
+                <label class="switch">
+                  <input type="checkbox" id="compactView">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="settings-group">
+              <h3>Analysis Preferences</h3>
+              <div class="setting-item">
+                <label for="autoSave">Auto-save Results</label>
+                <label class="switch">
+                  <input type="checkbox" id="autoSave" checked>
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label for="competitorAnalysis">Include Competitor Analysis</label>
+                <label class="switch">
+                  <input type="checkbox" id="competitorAnalysis" checked>
+                  <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label for="reportDetail">Report Detail Level</label>
+                <select id="reportDetail">
+                  <option value="basic">Basic - Key Metrics Only</option>
+                  <option value="standard" selected>Standard - Key Metrics + Recommendations</option>
+                  <option value="detailed">Detailed - All Available Data</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="settings-group">
+              <h3>Data Management</h3>
+              <div class="setting-item button-setting">
+                <button id="clearHistory" class="btn-warning">Clear Analysis History</button>
+                <p class="setting-description">Delete all saved analysis records from this device</p>
+              </div>
+              <div class="setting-item button-setting">
+                <button id="exportData" class="btn-primary">Export Saved Data</button>
+                <p class="setting-description">Download all your saved analyses as a JSON file</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    
+    <footer class="app-footer">
+      <p>&copy; 2025 ProspectPro - Website Analysis Tool</p>
+    </footer>
+  </div>
+  
+  <!-- Templates for dynamic content -->
+  <template id="resultTemplate">
+    <div class="results-card">
+      <div class="results-header">
+        <h3 class="website-url"></h3>
+        <span class="analyzed-date"></span>
+      </div>
+      
+      <div class="score-overview">
+        <div class="overall-score">
+          <div class="score-circle">
+            <span class="score-value"></span>
+          </div>
+          <span class="score-label">Overall Score</span>
+        </div>
+        
+        <div class="score-breakdown">
+          <div class="score-category performance">
+            <div class="category-name">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Performance</span>
+            </div>
+            <div class="score-bar">
+              <div class="bar-fill"></div>
+              <span class="category-score"></span>
+            </div>
+          </div>
+          
+          <div class="score-category seo">
+            <div class="category-name">
+              <i class="fas fa-search"></i>
+              <span>SEO</span>
+            </div>
+            <div class="score-bar">
+              <div class="bar-fill"></div>
+              <span class="category-score"></span>
+            </div>
+          </div>
+          
+          <div class="score-category content">
+            <div class="category-name">
+              <i class="fas fa-file-alt"></i>
+              <span>Content</span>
+            </div>
+            <div class="score-bar">
+              <div class="bar-fill"></div>
+              <span class="category-score"></span>
+            </div>
+          </div>
+          
+          <div class="score-category freshness">
+            <div class="category-name">
+              <i class="fas fa-calendar-alt"></i>
+              <span>Freshness</span>
+            </div>
+            <div class="score-bar">
+              <div class="bar-fill"></div>
+              <span class="category-score"></span>
+            </div>
+          </div>
+          
+          <div class="score-category mobile">
+            <div class="category-name">
+              <i class="fas fa-mobile-alt"></i>
+              <span>Mobile</span>
+            </div>
+            <div class="score-bar">
+              <div class="bar-fill"></div>
+              <span class="category-score"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tabs-container">
+        <div class="tabs">
+          <button class="tab-button active" data-tab="recommendations">Recommendations</button>
+          <button class="tab-button" data-tab="metrics">Detailed Metrics</button>
+          <button class="tab-button" data-tab="competitors">Competitors</button>
+        </div>
+        
+        <div class="tab-content">
+          <div class="tab-pane active" id="recommendations">
+            <div class="recommendations-list">
+              <!-- Recommendations will be populated here by JavaScript -->
+            </div>
+          </div>
+          
+          <div class="tab-pane" id="metrics">
+            <div class="metrics-grid">
+              <!-- Metrics will be populated here by JavaScript -->
+            </div>
+          </div>
+          
+          <div class="tab-pane" id="competitors">
+            <div class="competitors-list">
+              <!-- Competitors will be populated here by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="results-actions">
+        <button class="btn-primary download-report">
+          <i class="fas fa-download"></i> Download Report
+        </button>
+        <button class="btn-secondary share-report">
+          <i class="fas fa-share-alt"></i> Share
+        </button>
+      </div>
+    </div>
+  </template>
+  
+  <template id="recommendationTemplate">
+    <div class="recommendation-item">
+      <div class="recommendation-header">
+        <div class="recommendation-priority"></div>
+        <h4 class="recommendation-title"></h4>
+      </div>
+      <p class="recommendation-description"></p>
+      <ul class="recommendation-details">
+        <!-- Details will be populated here by JavaScript -->
+      </ul>
+    </div>
+  </template>
+  
+  <template id="historyItemTemplate">
+    <div class="history-item">
+      <div class="history-score"></div>
+      <div class="history-details">
+        <h4 class="history-url"></h4>
+        <span class="history-date"></span>
+      </div>
+      <div class="history-actions">
+        <button class="btn-view">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button class="btn-delete">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </template>
+  
+  <script src="/app.js"></script>
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch(err => {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+  </script>
+</body>
+</html>
